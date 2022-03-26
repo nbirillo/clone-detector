@@ -1,7 +1,6 @@
 package org.jetbrains.research.cloneDetector.core
 
 data class EndToken(val idSequence: Long) : Comparable<EndToken> {
-
     override fun toString(): String {
         return "#$idSequence"
     }

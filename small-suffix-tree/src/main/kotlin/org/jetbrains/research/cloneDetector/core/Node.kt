@@ -1,7 +1,6 @@
 package org.jetbrains.research.cloneDetector.core
 
 class Node internal constructor(var parentEdge: Edge?) : ScapeGoatTree<Any, Edge>() {
-
     var suffixLink: Node? = null
 
     internal fun putEdge(terminal: Node?, sequence: List<Any>, k: Short, p: Short): Edge {

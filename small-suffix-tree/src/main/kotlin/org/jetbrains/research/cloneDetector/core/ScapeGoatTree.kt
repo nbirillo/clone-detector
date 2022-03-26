@@ -3,7 +3,7 @@ package org.jetbrains.research.cloneDetector.core
 import java.util.*
 import kotlin.math.ln
 
-private val alpha: Double = 0.58
+private const val alpha: Double = 0.58
 
 val comparator: Comparator<Any> = tokenComparator
 
@@ -88,7 +88,7 @@ internal fun <K, V> ScapeGoatTree<K, V>.remove(key: K) {
     delete(key)
     if (size < alpha * maxSize) {
         if (root != null) {
-            root = Rebuild_Tree(size, root!!).first
+            root = rebuildTree(size, root!!).first
             maxSize = size
         }
     }
@@ -190,15 +190,15 @@ internal fun <K, V> ScapeGoatNode<K, V>?.size(): Int =
     if (this != null) left.size() + right.size() + 1
     else 0
 
-internal fun <K, V> flatten_tree(root: ScapeGoatNode<K, V>?, tail: ScapeGoatNode<K, V>? = null): ScapeGoatNode<K, V>? {
+internal fun <K, V> flattenTree(root: ScapeGoatNode<K, V>?, tail: ScapeGoatNode<K, V>? = null): ScapeGoatNode<K, V>? {
     if (root == null) return tail
-    root.right = flatten_tree(root.right, tail)
-    val result = flatten_tree(root.left, root)
+    root.right = flattenTree(root.right, tail)
+    val result = flattenTree(root.left, root)
     root.left = null
     return result
 }
 
-internal fun <K, V> Build_Height_Balanced_Tree(
+internal fun <K, V> buildHeightBalancedTree(
     size: Int,
     head: ScapeGoatNode<K, V>?
 ): Pair<ScapeGoatNode<K, V>?, ScapeGoatNode<K, V>?> {
@@ -211,24 +211,24 @@ internal fun <K, V> Build_Height_Balanced_Tree(
         head.right = null
         return Pair(root, root)
     }
-    val (leftRoot, leftLast) = Build_Height_Balanced_Tree(size / 2, head)
+    val (leftRoot, leftLast) = buildHeightBalancedTree(size / 2, head)
     val root = leftLast?.right ?: head
 
     root?.left = leftRoot
 
-    val (rightRoot, rightLast) = Build_Height_Balanced_Tree(size - size / 2 - 1, root?.right)
+    val (rightRoot, rightLast) = buildHeightBalancedTree(size - size / 2 - 1, root?.right)
     root?.right = rightRoot
 
     leftLast?.right = null
     return Pair(root, rightLast)
 }
 
-internal fun <K, V> Rebuild_Tree(
+internal fun <K, V> rebuildTree(
     size: Int,
     scapegoat: ScapeGoatNode<K, V>
 ): Pair<ScapeGoatNode<K, V>?, ScapeGoatNode<K, V>?> {
-    val head = flatten_tree(scapegoat, null)!!
-    return Build_Height_Balanced_Tree(size, head)
+    val head = flattenTree(scapegoat, null)!!
+    return buildHeightBalancedTree(size, head)
 }
 
 internal fun <K, V> ScapeGoatTree<K, V>.insert(node: ScapeGoatNode<K, V>) {
@@ -238,7 +238,7 @@ internal fun <K, V> ScapeGoatTree<K, V>.insert(node: ScapeGoatNode<K, V>) {
     if (height > h_alpha) {
         val (scapegoat, scapeGoatParent) = findScapeGoat(parents, node)
         val isLeft = scapeGoatParent?.left === scapegoat
-        val (root, _) = Rebuild_Tree(scapegoat.size(), scapegoat)
+        val (root, _) = rebuildTree(scapegoat.size(), scapegoat)
         if (scapeGoatParent == null) this.root = root
         else if (isLeft) scapeGoatParent.left = root
         else scapeGoatParent.right = root

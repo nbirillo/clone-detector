@@ -4,7 +4,6 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 class SuffixTree<T : Comparable<T>> {
-
     val root = Node(null)
 
     private val sequences: MutableMap<Long, List<Any>> = HashMap()
@@ -18,8 +17,7 @@ class SuffixTree<T : Comparable<T>> {
             var ga = s.getEdge(sequence[k])!!
             return if (t == ga.sequence[ga.k + p - k + 1]) {
                 Pair(true, s)
-            }
-            else {
+            } else {
                 val r = Node(ga)
                 val newEdge = r.putEdge(
                     ga.terminal,
@@ -35,8 +33,7 @@ class SuffixTree<T : Comparable<T>> {
         } else {
             return if (s.getEdge(t) == null) {
                 Pair(false, s)
-            }
-            else {
+            } else {
                 Pair(true, s)
             }
         }
@@ -51,8 +48,7 @@ class SuffixTree<T : Comparable<T>> {
         }
         return if (p < k) {
             Pair(s, k)
-        }
-        else {
+        } else {
             var ga: Edge = s.getEdge(sequence[k])!!
 
             while (ga.p - ga.k <= p - k) {
