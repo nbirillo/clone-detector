@@ -40,7 +40,7 @@ jobs:
           java-version: 11
     
       - uses: actions/checkout@v2
-      - run: ./gradlew build
+      - run: ./gradlew build --stacktrace
 
   test:
     needs: build
@@ -53,7 +53,7 @@ jobs:
           java-version: 11
       - uses: actions/checkout@v2
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test --stacktrace
 
   code-style:
     needs: build
@@ -65,4 +65,4 @@ jobs:
         with:
           java-version: 11
       - uses: actions/checkout@v2
-      - run: ./gradlew ktlintCheck
+      - run: ./gradlew ktlintCheck --stacktrace
