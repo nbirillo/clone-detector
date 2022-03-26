@@ -7,7 +7,6 @@ import org.jetbrains.research.cloneDetector.core.structures.CloneClass
 import org.jetbrains.research.cloneDetector.core.utils.printText
 import org.jetbrains.research.cloneDetector.core.utils.tokenSequence
 
-
 class ExtractSiblingClonesTest :
     FolderProjectTest("${getResourcesRootPath(::FolderProjectTest)}/sphinx4-java/") {
     private val clones

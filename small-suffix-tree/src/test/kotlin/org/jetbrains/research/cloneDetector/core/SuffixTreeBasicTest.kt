@@ -3,9 +3,7 @@ package org.jetbrains.research.cloneDetector.core
 import org.junit.Before
 import org.junit.Test
 
-
 data class CharToken(val char: Char) : Comparable<CharToken> {
-
     override fun toString(): String {
         return char.toString()
     }
@@ -67,5 +65,4 @@ class SuffixTreeBasicTest {
         tree.root.putEdge(sequence, 1)
         println("-------------------------")
     }
-
 }

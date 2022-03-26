@@ -5,7 +5,6 @@ import java.util.*
 import kotlin.system.measureTimeMillis
 
 data class LongToken(val value: Long) : Comparable<LongToken> {
-
     override fun toString(): String {
         return value.toString()
     }
