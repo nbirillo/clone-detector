@@ -47,7 +47,7 @@ jobs:
         if: ${{ always() }}
         with:
           name: test-report
-          path: clone-detector/build/reports/**
+          path: clone-detector/**/build/reports/**
 
   test:
     needs: build
