@@ -2,7 +2,6 @@ package org.jetbrains.research.cloneDetector.core
 
 import org.junit.Test
 
-
 class SuffixTreeRemovingTest {
     private var tree = SuffixTree<CharToken>()
     private var sequence1 = "cacao".map(::CharToken)

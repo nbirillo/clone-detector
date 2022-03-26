@@ -4,7 +4,6 @@ import org.junit.Test
 import java.util.*
 
 class ScapeGoatTest {
-
     private val elements = 10000
     private val toRemove = 9000
 
