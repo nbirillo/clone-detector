@@ -1,6 +1,7 @@
 package org.jetbrains.research.cloneDetector.core
 
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Ignore
 import kotlin.properties.Delegates
@@ -10,13 +11,20 @@ import kotlin.reflect.KFunction
 open class FolderProjectTest(private val testFolder: String) : BasePlatformTestCase() {
     var baseDirectoryPsi by Delegates.notNull<PsiDirectory>()
 
+
+
+
     override fun getTestDataPath() = testFolder
 
     override fun setUp() {
         super.setUp()
         val directory = myFixture.copyDirectoryToProject("/", "")
         baseDirectoryPsi = myFixture.psiManager.findDirectory(directory)!!
+//        CloneIndexer.addFile(file)
+//      baseFilePsi = myFixture.psiManager.findFile(directory)!!
     }
+
+
 
     companion object {
         // We can not get the root of the class resources automatically

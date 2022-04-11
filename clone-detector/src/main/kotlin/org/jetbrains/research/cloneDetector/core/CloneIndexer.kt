@@ -2,6 +2,7 @@ package org.jetbrains.research.cloneDetector.core
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
+import org.jetbrains.research.cloneDetector.core.languagescope.java.JavaIndexedPsiDefiner
 import org.jetbrains.research.cloneDetector.core.languagescope.languageSerializer
 import org.jetbrains.research.cloneDetector.core.postprocessing.filterSubClassClones
 import org.jetbrains.research.cloneDetector.core.structures.SourceToken
@@ -30,7 +31,8 @@ object CloneIndexer {
 
     fun addFile(psiFile: PsiFile): Unit = rwLock.write {
         if (psiFile.virtualFile in fileSequenceIds) return
-        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
+//        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
+        val indexedPsiDefiner = JavaIndexedPsiDefiner()
         val ids = mutableListOf<Long>()
         indexedPsiDefiner?.getIndexedChildren(psiFile)?.map {
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
