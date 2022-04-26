@@ -29,4 +29,5 @@ class LanguageIndexedPsiService {
 }
 
 val Project.languageSerializer: LanguageIndexedPsiService
-    get() = ServiceManager.getService(this, LanguageIndexedPsiService::class.java)!!
+    get() = this.getService(LanguageIndexedPsiService::class.java)!!
+

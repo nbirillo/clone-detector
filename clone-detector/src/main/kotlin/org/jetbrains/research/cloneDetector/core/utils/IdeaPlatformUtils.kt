@@ -16,6 +16,8 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.source.tree.ElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
+import com.jetbrains.python.PyElementTypes
 
 val Application: Application
     get() = ApplicationManager.getApplication()
@@ -52,8 +54,18 @@ private val javaTokenFilter = TokenSet.create(
     ElementType.MODIFIER_LIST
 )
 
-fun isNoiseElement(psiElement: PsiElement): Boolean =
-    psiElement in javaTokenFilter || psiElement.textLength == 0
+private val pythonTokenFilter = setOf(
+    "Py:DOCSTRING",
+    "Py:END_OF_LINE_COMMENT",
+    "Py:IMPORT_STATEMENT",
+    "Py:FROM_IMPORT_STATEMENT"
+)
+
+
+fun isNoiseElement(psiElement: PsiElement): Boolean = psiElement in javaTokenFilter
+        || psiElement.textLength == 0
+        || pythonTokenFilter.contains(psiElement.elementType.toString())
+
 
 fun PsiElement.nextLeafElement(): PsiElement? {
     var current = this

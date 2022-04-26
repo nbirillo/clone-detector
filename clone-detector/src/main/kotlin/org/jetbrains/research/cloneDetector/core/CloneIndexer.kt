@@ -2,17 +2,32 @@ package org.jetbrains.research.cloneDetector.core
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
-import org.jetbrains.research.cloneDetector.core.languagescope.languageSerializer
+import org.jetbrains.kotlin.idea.core.util.end
+import org.jetbrains.kotlin.idea.core.util.start
+import org.jetbrains.research.cloneDetector.core.languagescope.java.JavaIndexedPsiDefiner
 import org.jetbrains.research.cloneDetector.core.postprocessing.filterSubClassClones
 import org.jetbrains.research.cloneDetector.core.structures.SourceToken
 import org.jetbrains.research.cloneDetector.core.structures.TreeCloneClass
 import org.jetbrains.research.cloneDetector.core.utils.addIf
 import org.jetbrains.research.cloneDetector.core.utils.riseTraverser
+import org.jetbrains.research.cloneDetector.core.utils.tokenSequence
 import org.jetbrains.research.cloneDetector.ide.configuration.PluginSettings
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+import com.google.gson.Gson
+import com.intellij.psi.util.elementType
+import org.jetbrains.research.cloneDetector.core.languagescope.python.PyIndexedPsiDefiner
+
+
+data class ClonesDataToJson(
+    val clonesGroupsCount: Int,
+    val totalClonesCount: Int,
+    val clonesCountByGroups: List<Int>,
+    val tokenLengthByGroups: List<Int>,
+    val clonesPositions: List<List<List<List<Int>>>>?
+)
 
 object CloneIndexer {
     internal var tree = SuffixTree<SourceToken>()
@@ -30,10 +45,18 @@ object CloneIndexer {
 
     fun addFile(psiFile: PsiFile): Unit = rwLock.write {
         if (psiFile.virtualFile in fileSequenceIds) return
-        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
+//        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
+
+//        val indexedPsiDefiner = JavaIndexedPsiDefiner()
+        val indexedPsiDefiner = PyIndexedPsiDefiner()
+
         val ids = mutableListOf<Long>()
-        indexedPsiDefiner?.getIndexedChildren(psiFile)?.map {
+        listOf(psiFile).map {
+//         indexedPsiDefiner?.getIndexedChildren(psiFile)?
+//             .map {
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
+            println(sequence)
+
             if (sequence.size > PluginSettings.minCloneLength) {
                 indexedTokens += sequence.size
                 val id = tree.addSequence(sequence)
@@ -66,6 +89,49 @@ object CloneIndexer {
 
     fun getAllCloneClasses(): List<TreeCloneClass> = rwLock.read {
         tree.getAllCloneClasses(PluginSettings.minCloneLength)
+    }
+
+//    fun getClones(): List<TreeCloneClass> {
+//        val file = myFixture.configureByFile("${getResourcesRootPath(::FolderProjectTest)}/debug/SimpleClass.java")!!
+//        CloneIndexer.addFile(file)
+//        return CloneIndexer.getAllCloneClasses().filterSubClassClones().toList()
+//    }
+
+    fun getClonesSubTreesCount(): Int = this.getAllCloneClasses().filterSubClassClones().toList().size
+
+    private fun getClones() = this.getAllCloneClasses().filterSubClassClones().toList()
+
+    fun getClonesGroupsCount() = getClones().size
+
+    fun getTotalClonesCount() = getClonesCountByGroups().sum()
+
+    fun getClonesCountByGroups() = getClones().map { tree -> tree.clones.toList().size }.toList()
+
+    fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
+
+    fun getClonesPositions() = getClones().map{ tree ->
+        tree.clones.map {
+            it.tokenSequence().map { el ->
+                val start = el.textRange.start
+                val end = el.textRange.end
+                listOf(start, end)
+            }.toList()
+        }.toList()
+    }.toList()
+
+
+    fun dataToJson(isTokenLength: Boolean): String {
+        val gson = Gson()
+
+        return gson.toJson(
+            ClonesDataToJson(
+                getClonesGroupsCount(),
+                getTotalClonesCount(),
+                getClonesCountByGroups(),
+                getTokenLengthByGroups(),
+                if (isTokenLength) getClonesPositions() else null
+            )
+        )
     }
 }
 
