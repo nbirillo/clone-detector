@@ -47,8 +47,8 @@ object CloneIndexer {
     fun addFile(psiFile: PsiFile): Unit = rwLock.write {
         if (psiFile.virtualFile in fileSequenceIds) return
 //        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
-
-        println(psiFile.asSequence().toList().elementAt(5))
+        print("CLONE INDEXER ")
+        println(psiFile.asSequence().toList().elementAt(10))
 //        val indexedPsiDefiner = JavaIndexedPsiDefiner()
         val indexedPsiDefiner = PyIndexedPsiDefiner()
 
