@@ -54,8 +54,7 @@ object CloneIndexer {
 
         val ids = mutableListOf<Long>()
 //        listOf(psiFile).map {
-         indexedPsiDefiner?.getIndexedChildren(psiFile)?
-             .map {
+         indexedPsiDefiner?.getIndexedChildren(psiFile)?.map {
             println("IN ITERATOR ${it.name}")
             println("SEQUENCE ${indexedPsiDefiner.createIndexedSequence(it)}")
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
