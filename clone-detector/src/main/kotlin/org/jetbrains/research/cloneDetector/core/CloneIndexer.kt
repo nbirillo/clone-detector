@@ -47,7 +47,7 @@ object CloneIndexer {
     fun addFile(psiFile: PsiFile): Unit = rwLock.write {
         if (psiFile.virtualFile in fileSequenceIds) return
 //        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
-        print("CLONE INDEXER ")
+        print("CLONE INDEXER BEFORE SEQUENCE SIZE ${psiFile.asSequence().toList().size}")
 //        println(psiFile.asSequence())
 //        val indexedPsiDefiner = JavaIndexedPsiDefiner()
         val indexedPsiDefiner = PyIndexedPsiDefiner()
@@ -57,10 +57,10 @@ object CloneIndexer {
 //         indexedPsiDefiner?.getIndexedChildren(psiFile)?
 //             .map {
             println("IN ITERATOR ${it.name}")
-            println("SEQUENCE ${indexedPsiDefiner.createIndexedSequence(it).toString()}")
+            println("SEQUENCE ${indexedPsiDefiner.createIndexedSequence(it)}")
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
 //            val sequence = psiFile.asSequence().toList()
-            println(sequence)
+            println("SEQUENCE AS LIST $sequence WITH LENGTH ${sequence.size}")
 
             if (sequence.size > PluginSettings.minCloneLength) {
                 indexedTokens += sequence.size
