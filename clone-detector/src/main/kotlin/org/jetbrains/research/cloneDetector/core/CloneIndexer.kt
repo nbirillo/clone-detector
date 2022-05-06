@@ -48,7 +48,7 @@ object CloneIndexer {
         if (psiFile.virtualFile in fileSequenceIds) return
 //        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
         print("CLONE INDEXER ")
-        println(psiFile.asSequence().toList().elementAt(10))
+//        println(psiFile.asSequence())
 //        val indexedPsiDefiner = JavaIndexedPsiDefiner()
         val indexedPsiDefiner = PyIndexedPsiDefiner()
 
@@ -56,7 +56,8 @@ object CloneIndexer {
         listOf(psiFile).map {
 //         indexedPsiDefiner?.getIndexedChildren(psiFile)?
 //             .map {
-            val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
+//            val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
+            val sequence = psiFile.asSequence().toList()
             println(sequence)
 
             if (sequence.size > PluginSettings.minCloneLength) {
