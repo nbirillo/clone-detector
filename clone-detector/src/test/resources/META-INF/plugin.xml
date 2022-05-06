@@ -1,0 +1,14 @@
+<idea-plugin>
+    <id>org.jetbrains.research.ml.pythonClonesAnalysis</id>
+    <name>Python Clones Analysis</name>
+    <vendor>JetBrains Research</vendor>
+
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>org.intellij.groovy</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.python</depends>
+
+</idea-plugin>

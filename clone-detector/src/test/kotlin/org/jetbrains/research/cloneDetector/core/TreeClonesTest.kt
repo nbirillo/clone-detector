@@ -78,8 +78,8 @@ class TreeClonesTest : FolderProjectTest("${getResourcesRootPath(::FolderProject
         val gson = Gson()
         val jsonObject = JsonObject()
         val filename = file.toString().substring(file.toString().lastIndexOf("/")+1);
-
-        for (length in 5..80 step 5) {
+        println(filename)
+        for (length in 5..10 step 5) {
             PluginSettings.minCloneLength = length
 
             val clones = getClones(filename)

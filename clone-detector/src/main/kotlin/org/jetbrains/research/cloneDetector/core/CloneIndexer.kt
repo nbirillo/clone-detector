@@ -19,6 +19,7 @@ import kotlin.concurrent.write
 import com.google.gson.Gson
 import com.intellij.psi.util.elementType
 import org.jetbrains.research.cloneDetector.core.languagescope.python.PyIndexedPsiDefiner
+import org.jetbrains.research.cloneDetector.core.utils.asSequence
 
 
 data class ClonesDataToJson(
@@ -47,6 +48,7 @@ object CloneIndexer {
         if (psiFile.virtualFile in fileSequenceIds) return
 //        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
 
+        println(psiFile.asSequence().toList().elementAt(5))
 //        val indexedPsiDefiner = JavaIndexedPsiDefiner()
         val indexedPsiDefiner = PyIndexedPsiDefiner()
 
