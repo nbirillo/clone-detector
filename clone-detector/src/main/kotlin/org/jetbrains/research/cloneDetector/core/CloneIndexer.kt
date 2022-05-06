@@ -56,6 +56,8 @@ object CloneIndexer {
         listOf(psiFile).map {
 //         indexedPsiDefiner?.getIndexedChildren(psiFile)?
 //             .map {
+            println("IN ITERATOR ${it.name}")
+            println("SEQUENCE ${indexedPsiDefiner.createIndexedSequence(it).toString()}")
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
 //            val sequence = psiFile.asSequence().toList()
             println(sequence)
