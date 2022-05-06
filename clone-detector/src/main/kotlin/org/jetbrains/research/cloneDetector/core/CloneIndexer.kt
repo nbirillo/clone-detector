@@ -56,8 +56,8 @@ object CloneIndexer {
         listOf(psiFile).map {
 //         indexedPsiDefiner?.getIndexedChildren(psiFile)?
 //             .map {
-//            val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
-            val sequence = psiFile.asSequence().toList()
+            val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
+//            val sequence = psiFile.asSequence().toList()
             println(sequence)
 
             if (sequence.size > PluginSettings.minCloneLength) {
