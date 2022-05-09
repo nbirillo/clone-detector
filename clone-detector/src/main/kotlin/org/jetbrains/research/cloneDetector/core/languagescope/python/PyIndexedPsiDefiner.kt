@@ -6,6 +6,7 @@ import com.intellij.psi.PsiMethod
 import org.jetbrains.research.cloneDetector.core.languagescope.IndexedPsiDefiner
 import org.jetbrains.research.cloneDetector.core.languagescope.java.JavaIndexedSequence
 import org.jetbrains.research.cloneDetector.core.structures.IndexedSequence
+import org.jetbrains.research.cloneDetector.core.utils.asSequence
 
 class PyIndexedPsiDefiner : IndexedPsiDefiner {
     override val fileType: String
@@ -19,7 +20,7 @@ class PyIndexedPsiDefiner : IndexedPsiDefiner {
     override fun createIndexedSequence(psiElement: PsiElement): IndexedSequence {
 //        require(isIndexed(psiElement))
         print("INDEXED PYTHON ")
-        println(psiElement.toString())
+        println(psiElement.asSequence().toList().slice(1..5))
         return PyIndexedSequence(psiElement)
     }
 }

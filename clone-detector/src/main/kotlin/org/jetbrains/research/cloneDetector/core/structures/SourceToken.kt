@@ -6,6 +6,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.source.tree.ElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.elementType
+import org.jetbrains.kotlin.tools.projectWizard.core.asSuccess
 import org.jetbrains.research.cloneDetector.core.utils.CurrentProject
 import org.jetbrains.research.cloneDetector.core.utils.abbreviate
 
@@ -55,7 +56,7 @@ class SourceToken(source: PsiElement) : Comparable<SourceToken> {
         }
 }
 
-fun PsiElement.notNeedAnonimization() =
-    parent?.parent.elementType in TokenSet.create(ElementType.METHOD_CALL_EXPRESSION) &&
-            parent.elementType in TokenSet.create(ElementType.REFERENCE_EXPRESSION) &&
-            this.elementType in TokenSet.create(ElementType.IDENTIFIER)
+fun PsiElement.notNeedAnonimization() = false
+//    parent?.parent.elementType in TokenSet.create(ElementType.METHOD_CALL_EXPRESSION) &&
+//            parent.elementType in TokenSet.create(ElementType.REFERENCE_EXPRESSION) &&
+//            this.elementType in TokenSet.create(ElementType.IDENTIFIER)
