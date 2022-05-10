@@ -43,24 +43,15 @@ object CloneIndexer {
         tree = SuffixTree()
     }
 
-    val fileSequenceIds = HashMap<VirtualFile, List<Long>>()
+    private val fileSequenceIds = HashMap<VirtualFile, List<Long>>()
 
     fun addFile(psiFile: PsiFile): Unit = rwLock.write {
         if (psiFile.virtualFile in fileSequenceIds) return
-//        val indexedPsiDefiner = psiFile.project.languageSerializer.getIndexedPsiDefiner(psiFile)
-        print("CLONE INDEXER BEFORE SEQUENCE SIZE ${psiFile.asSequence().toList().size}")
-//        println(psiFile.asSequence())
-//        val indexedPsiDefiner = JavaIndexedPsiDefiner()
         val indexedPsiDefiner = PyIndexedPsiDefiner()
 
         val ids = mutableListOf<Long>()
-//        listOf(psiFile).map {
-         indexedPsiDefiner?.getIndexedChildren(psiFile)?.map {
-//            println("IN ITERATOR ${it.name}")
-            println("SEQUENCE ${indexedPsiDefiner.createIndexedSequence(it)}")
+        indexedPsiDefiner.getIndexedChildren(psiFile).map {
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
-//            val sequence = psiFile.asSequence().toList()
-            println("SEQUENCE AS LIST $sequence WITH LENGTH ${sequence.size}")
 
             if (sequence.size > PluginSettings.minCloneLength) {
                 indexedTokens += sequence.size
@@ -96,25 +87,19 @@ object CloneIndexer {
         tree.getAllCloneClasses(PluginSettings.minCloneLength)
     }
 
-//    fun getClones(): List<TreeCloneClass> {
-//        val file = myFixture.configureByFile("${getResourcesRootPath(::FolderProjectTest)}/debug/SimpleClass.java")!!
-//        CloneIndexer.addFile(file)
-//        return CloneIndexer.getAllCloneClasses().filterSubClassClones().toList()
-//    }
-
     fun getClonesSubTreesCount(): Int = this.getAllCloneClasses().filterSubClassClones().toList().size
 
     private fun getClones() = this.getAllCloneClasses().filterSubClassClones().toList()
 
-    fun getClonesGroupsCount() = getClones().size
+    private fun getClonesGroupsCount() = getClones().size
 
-    fun getTotalClonesCount() = getClonesCountByGroups().sum()
+    private fun getTotalClonesCount() = getClonesCountByGroups().sum()
 
-    fun getClonesCountByGroups() = getClones().map { tree -> tree.clones.toList().size }.toList()
+    private fun getClonesCountByGroups() = getClones().map { tree -> tree.clones.toList().size }.toList()
 
-    fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
+    private fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
 
-    fun getClonesPositions() = getClones().map{ tree ->
+    private fun getClonesPositions() = getClones().map{ tree ->
 //        tree.clones.map {
 //            it.tokenSequence().map { el ->
 //                val start = el.textRange.start

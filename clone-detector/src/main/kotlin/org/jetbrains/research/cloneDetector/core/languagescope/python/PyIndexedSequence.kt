@@ -10,7 +10,6 @@ import org.jetbrains.research.cloneDetector.core.utils.isNoiseElement
 class PyIndexedSequence(val psiElement: PsiElement) : IndexedSequence {
     override val sequence: Sequence<SourceToken>
         get() = psiElement.asSequence().filterNot(::isNoiseElement).map(::SourceToken)
-//        get() = psiElement.toSequence().map(::SourceToken)
 }
 
 private fun PsiElement.toSequence(): Sequence<PsiElement> =

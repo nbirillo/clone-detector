@@ -18,9 +18,7 @@ class PyIndexedPsiDefiner : IndexedPsiDefiner {
     }
 
     override fun createIndexedSequence(psiElement: PsiElement): IndexedSequence {
-//        require(isIndexed(psiElement))
-        print("INDEXED PYTHON ")
-        println(psiElement.asSequence().toList().slice(1..5))
+        require(isIndexed(psiElement))
         return PyIndexedSequence(psiElement)
     }
 }
