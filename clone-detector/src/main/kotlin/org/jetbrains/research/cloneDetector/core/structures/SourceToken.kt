@@ -56,7 +56,7 @@ class SourceToken(source: PsiElement) : Comparable<SourceToken> {
         }
 }
 
-fun PsiElement.notNeedAnonimization() = false
+fun PsiElement.notNeedAnonimization() = true
 //    parent?.parent.elementType in TokenSet.create(ElementType.METHOD_CALL_EXPRESSION) &&
 //            parent.elementType in TokenSet.create(ElementType.REFERENCE_EXPRESSION) &&
 //            this.elementType in TokenSet.create(ElementType.IDENTIFIER)
