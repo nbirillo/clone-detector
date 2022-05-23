@@ -101,7 +101,7 @@ object CloneIndexer {
     private fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
 
     private fun getClonesPsiSequences() = getClones().map { tree -> tree.clones.map{
-            it.tokenSequence().toList().toString()
+            it.tokenSequence().map{i -> i.node.elementType.toString()}.toList().toString()
         }.toList()
     }.toList()
 
