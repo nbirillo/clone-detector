@@ -27,6 +27,7 @@ data class ClonesDataToJson(
     val totalClonesCount: Int,
     val clonesCountByGroups: List<Int>,
     val tokenLengthByGroups: List<Int>,
+    val clonesStringSequencesByGroups: List<String>,
 //    val clonesPositions: List<List<List<Int>>>?
     val clonesPositions: List<List<List<List<Int>>>>?
 )
@@ -99,7 +100,9 @@ object CloneIndexer {
 
     private fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
 
-        private fun getClonesPositions() = getClones().map{ tree ->
+    private fun getClonesPsiSequences() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().toString() }.toList()
+
+    private fun getClonesPositions() = getClones().map{ tree ->
         tree.clones.map {
             it.tokenSequence().map { el ->
                 val start = el.textRange.start
@@ -125,6 +128,7 @@ object CloneIndexer {
                 getTotalClonesCount(),
                 getClonesCountByGroups(),
                 getTokenLengthByGroups(),
+                getClonesPsiSequences(),
                 if (isTokenLength) getClonesPositions() else null
             )
         )
