@@ -64,7 +64,7 @@ private val pythonTokenFilter = setOf(
 
 fun isNoiseElement(psiElement: PsiElement): Boolean = psiElement in javaTokenFilter
         || psiElement.textLength == 0
-        || pythonTokenFilter.contains(psiElement.elementType.toString())
+        // || pythonTokenFilter.contains(psiElement.elementType.toString())
 
 
 fun PsiElement.nextLeafElement(): PsiElement? {
