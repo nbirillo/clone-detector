@@ -5,6 +5,8 @@ import org.jetbrains.research.cloneDetector.core.utils.tokenSequence
 class RangeCloneClass(val cloneRanges: List<Clone>) : CloneClass {
     init {
         require(cloneRanges.size > 1)
+        println(cloneRanges.toList().map{ i -> i.tokenSequence().toList().size}.toList().distinct())
+        require(cloneRanges.toList().map{ i -> i.tokenSequence().toList().size}.toList().distinct().size == 1)
     }
 
     override val size: Int

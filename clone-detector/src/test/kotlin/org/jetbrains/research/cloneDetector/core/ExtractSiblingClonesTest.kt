@@ -6,6 +6,7 @@ import org.jetbrains.research.cloneDetector.core.postprocessing.splitSiblingClon
 import org.jetbrains.research.cloneDetector.core.structures.CloneClass
 import org.jetbrains.research.cloneDetector.core.utils.printText
 import org.jetbrains.research.cloneDetector.core.utils.tokenSequence
+import org.jetbrains.research.cloneDetector.ide.configuration.PluginSettings
 
 class ExtractSiblingClonesTest :
     FolderProjectTest("${getResourcesRootPath(::FolderProjectTest)}/debug/") {

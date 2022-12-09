@@ -2,17 +2,19 @@ package org.jetbrains.research.cloneDetector.core
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.jetbrains.kotlin.idea.core.util.end
-import org.jetbrains.kotlin.idea.core.util.start
 import org.jetbrains.research.cloneDetector.core.postprocessing.filterSubClassClones
+import org.jetbrains.research.cloneDetector.core.postprocessing.helpers.cropBadTokens
+import org.jetbrains.research.cloneDetector.core.postprocessing.helpers.extractSiblingSequences
+import org.jetbrains.research.cloneDetector.core.postprocessing.validClonesFilter
 import org.jetbrains.research.cloneDetector.core.structures.CloneClass
+import org.jetbrains.research.cloneDetector.core.structures.PsiRange
 import org.jetbrains.research.cloneDetector.core.structures.TreeClone
 import org.jetbrains.research.cloneDetector.core.structures.TreeCloneClass
 import org.jetbrains.research.cloneDetector.core.utils.areEqual
+import org.jetbrains.research.cloneDetector.core.utils.printText
 import org.jetbrains.research.cloneDetector.core.utils.tokenSequence
 import org.jetbrains.research.cloneDetector.ide.configuration.PluginSettings
 import java.io.File
-import java.io.InputStream
 
 //"${getResourcesRootPath(::FolderProjectTest)}/debug/"
 class TreeClonesTest : FolderProjectTest("${getResourcesRootPath(::FolderProjectTest)}/debug/") {
@@ -21,9 +23,8 @@ class TreeClonesTest : FolderProjectTest("${getResourcesRootPath(::FolderProject
 
         val file = myFixture.configureByFile("${getResourcesRootPath(::FolderProjectTest)}/debug/$filename")!!
         CloneIndexer.addFile(file)
-        val clones = CloneIndexer.getAllCloneClasses().filterSubClassClones().toList()
 
-        return clones
+        return CloneIndexer.getAllCloneClasses().filterSubClassClones().toList()
     }
 
     fun getClonesText(clones: Sequence<TreeClone>): String {
@@ -42,9 +43,10 @@ class TreeClonesTest : FolderProjectTest("${getResourcesRootPath(::FolderProject
 //        }
         clones.forEachIndexed { i, it ->
             print("($i.) ")
-            it.tokenSequence().forEach { el ->
-                print(el.text)
-            }
+//            it.tokenSequence().forEach { el ->
+//                print(el.text)
+//            }
+            it.printText()
             println("\n----------------------")
         }
         return ""
@@ -77,22 +79,44 @@ class TreeClonesTest : FolderProjectTest("${getResourcesRootPath(::FolderProject
     fun doAnalysis(file: File) {
         val gson = Gson()
         val jsonObject = JsonObject()
-        val filename = file.toString().substring(file.toString().lastIndexOf("/")+1);
+        val filename = file.toString().substring(file.toString().lastIndexOf("/") + 1);
         println(filename)
-        for (length in 5..10 step 5) {
+        for (length in 20..20 step 5) {
             PluginSettings.minCloneLength = length
 
             val clones = getClones(filename)
-//            println(clones.size)
-//
+            println(clones.size)
+
+            clones.forEachIndexed { i, it ->
+                print("($i.) ")
+                for (clone in it.clones) {
+//                    println("${clone.startLine}, ${clone.endLine}")
+                    clone.printText()
+                    println("+++++++++++++++")
+                }
+//                it.printText()
+                println("\n----------------------")
+            }
+//            getClonesText(clones.asSequence())
+//            clones.forEach{ tree ->
+//                tree.clones.forEach {
+//                    // (${i.text}
+//                    println(it.tokenSequence().toList().size)
+//                    it.tokenSequence().toList().forEach { i -> print("${i.node.elementType}(${i.text}) -> ") }
+//                    println()
+//                    println("-------------------")
+//                }
+//                println("=====================")
+//            }
+
 //            println(CloneIndexer.getClonesGroupsCount())
 //            println(CloneIndexer.getClonesCountByGroups())
-//            println(CloneIndexer.getTokenLengthByGroups())
+            println(CloneIndexer.getTokenLengthByGroups())
 //            println(CloneIndexer.getTotalClonesCount())
 
             jsonObject.addProperty(
                 "${PluginSettings.minCloneLength}",
-                CloneIndexer.dataToJson(isTokenLength=false)
+                CloneIndexer.dataToJson(isTokenLength = false)
             )
             assertTrue(clones.all(::checkCountInvariant))
             val filee = myFixture.configureByFile("${getResourcesRootPath(::FolderProjectTest)}/debug/$filename")!!
@@ -108,61 +132,31 @@ class TreeClonesTest : FolderProjectTest("${getResourcesRootPath(::FolderProject
     }
 
     fun testClonesSize() {
-//        val gson = Gson()
-//        val jsonObject = JsonObject()
+        PluginSettings.minCloneLength = 3
 
-        File("${getResourcesRootPath(::FolderProjectTest)}/debug/").walkTopDown().forEachIndexed { i, it ->
-            if (it.extension == "py") {
-                println("($i)")
+        File("${getResourcesRootPath(::FolderProjectTest)}/debug/").walkTopDown().forEach { it ->
+            if (it.extension == "py" && it.nameWithoutExtension == "notebook8075") {
+                val gson = Gson()
+                val jsonObject = JsonObject()
 
-                doAnalysis(it)
+                val filename = it.toString().substring(it.toString().lastIndexOf("/") + 1)
+                val clones = getClones(filename)
+
+                jsonObject.addProperty(
+                    "${PluginSettings.minCloneLength}",
+                    CloneIndexer.dataToJson2(isTokenLength = false)
+                )
+
+                val targetDir = "/Users/konstantingrotov/Documents/programming/data/clones/test/"
+                val scriptFile = File("${targetDir}${filename}.json")
+                val file = myFixture.configureByFile("${getResourcesRootPath(::FolderProjectTest)}/debug/$filename")!!
+
+                scriptFile.writeText(Gson().toJson(jsonObject).toString())
+                CloneIndexer.removeFile(file.virtualFile)
+
             }
         }
-
-        assertTrue(true)
-//        for (length in 5..80 step 5) {
-//
-//            PluginSettings.minCloneLength = length
-//            println(PluginSettings.minCloneLength)
-//
-//            val clones = getClones()
-//
-////            print("SIZE ")
-////            println(clones.size)
-////            clones.forEach { tree ->
-////                tree.clones.forEach {
-////                    it.tokenSequence().forEach { el ->
-////                        print(el.text)
-////                    }
-////                    println()
-////                    println("------------------")
-////                }
-////                println("====================")
-////            }
-//
-////
-//            println(CloneIndexer.getClonesGroupsCount())
-//            println(CloneIndexer.getClonesCountByGroups())
-//            println(CloneIndexer.getTokenLengthByGroups())
-//            println(CloneIndexer.getTotalClonesCount())
-//
-//            jsonObject.addProperty(
-//                "${PluginSettings.minCloneLength}",
-//                CloneIndexer.dataToJson(isTokenLength=false)
-//            )
-//            assertTrue(clones.all(::checkCountInvariant))
-//        }
-//
-//        val targetDir = "/Users/konstantingrotov/Documents/Programming/tools/clones-analysis/data/"
-//        val name = "4.json"
-//        val scriptFile = File("$targetDir$name")
-//        scriptFile.writeText(Gson().toJson(jsonObject).toString())
-
     }
-
-//    fun testSameTokenLengthSequence() {
-//        assertTrue(clones.all(::checkTokenLengthInvariant))
-//    }
 }
 
 fun checkCountInvariant(cloneClass: CloneClass): Boolean =

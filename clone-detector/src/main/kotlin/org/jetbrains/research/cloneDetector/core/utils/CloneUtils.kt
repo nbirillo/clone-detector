@@ -26,8 +26,11 @@ val Clone.textRange: TextRange
 val Clone.hasValidElements: Boolean
     get() = firstPsi.isValid && lastPsi.isValid
 
+val Clone.text: String
+    get() = firstPsi.document.getText((textRange))
+
 fun Clone.printText() {
-    println(firstPsi.document.getText(textRange))
+    println(text)
 }
 
 fun Clone.tokenSequence(): Sequence<PsiElement> =

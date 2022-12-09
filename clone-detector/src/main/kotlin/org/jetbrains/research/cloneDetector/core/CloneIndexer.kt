@@ -8,9 +8,6 @@ import org.jetbrains.research.cloneDetector.core.languagescope.java.JavaIndexedP
 import org.jetbrains.research.cloneDetector.core.postprocessing.filterSubClassClones
 import org.jetbrains.research.cloneDetector.core.structures.SourceToken
 import org.jetbrains.research.cloneDetector.core.structures.TreeCloneClass
-import org.jetbrains.research.cloneDetector.core.utils.addIf
-import org.jetbrains.research.cloneDetector.core.utils.riseTraverser
-import org.jetbrains.research.cloneDetector.core.utils.tokenSequence
 import org.jetbrains.research.cloneDetector.ide.configuration.PluginSettings
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -18,13 +15,48 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 import com.google.gson.Gson
 import com.intellij.psi.util.elementType
+import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.research.cloneDetector.core.languagescope.python.PyIndexedPsiDefiner
-import org.jetbrains.research.cloneDetector.core.utils.asSequence
+import org.jetbrains.research.cloneDetector.core.utils.*
+import java.text.FieldPosition
 
 
 data class ClonesDataToJson(
     val clonesGroupsCount: Int,
     val totalClonesCount: Int,
+    val clonesCountByGroups: List<Int>,
+    val tokenLengthByGroups: List<Int>,
+    val clonesStringSequencesByGroups: List<List<String>>,
+//    val clonesPositions: List<List<List<Int>>>?
+    val clonesPositions: List<List<List<List<Int>>>>?
+)
+
+
+data class Clone(
+    val psi: String,
+    val text: String,
+    val position: List<Int>
+)
+
+data class Group(
+    val clone_length: Int,
+    val clones: List<Clone>
+)
+
+data class AllClones(
+    val totalGroups: Int,
+    val totalClones: Int,
+    val groups: List<Group>
+)
+
+//data class AllClones(
+//    val totalGroups: Int,
+//    val totalClones: Int,
+//    val groups: List<List<Clone>>
+//)
+
+data class CloneGroup(
+    val ClonesCount: Int,
     val clonesCountByGroups: List<Int>,
     val tokenLengthByGroups: List<Int>,
     val clonesStringSequencesByGroups: List<List<String>>,
@@ -54,6 +86,7 @@ object CloneIndexer {
         indexedPsiDefiner.getIndexedChildren(psiFile).map {
             val sequence = indexedPsiDefiner.createIndexedSequence(it).sequence.toList()
 
+//            println(sequence)
             if (sequence.size > PluginSettings.minCloneLength) {
                 indexedTokens += sequence.size
                 val id = tree.addSequence(sequence)
@@ -92,13 +125,13 @@ object CloneIndexer {
 
     private fun getClones() = this.getAllCloneClasses().filterSubClassClones().toList()
 
-    private fun getClonesGroupsCount() = getClones().size
+    fun getClonesGroupsCount() = getClones().size
 
     private fun getTotalClonesCount() = getClonesCountByGroups().sum()
 
-    private fun getClonesCountByGroups() = getClones().map { tree -> tree.clones.toList().size }.toList()
+    fun getClonesCountByGroups() = getClones().map { tree -> tree.clones.toList().size }.toList()
 
-    private fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
+    fun getTokenLengthByGroups() = getClones().map { tree -> tree.clones.first().tokenSequence().toList().size }.toList()
 
     private fun getClonesPsiSequences() = getClones().map { tree -> tree.clones.map{
             it.tokenSequence().map{i -> i.node.elementType.toString()}.toList().toString()
@@ -121,7 +154,6 @@ object CloneIndexer {
 //        }.toList()
     }.toList()
 
-
     fun dataToJson(isTokenLength: Boolean): String {
         val gson = Gson()
 
@@ -134,6 +166,60 @@ object CloneIndexer {
                 getClonesPsiSequences(),
                 if (isTokenLength) getClonesPositions() else null
             )
+        )
+    }
+
+    //    clones.forEach { cln ->
+    //                    val t = cln.clones.toList()
+//
+//                    t.forEach{ii ->
+//                        println(ii.tokenSequence().toList().size.toString() + " " + ii.tokenSequence().toList())
+//                        ii.printText()
+//                    }
+//                    println("===")
+//                }
+    fun dataToJson2(isTokenLength: Boolean): String {
+        val gson = Gson()
+        val clonesGroups = getClones()
+        val totalGroups = clonesGroups.size
+
+
+        val listOfGroups: MutableList<Group> = mutableListOf()
+        var totalClones = 0
+
+        for (group in clonesGroups) {
+            val listGroup = mutableListOf<Clone>()
+            val cloneTokensSize = group.clones.toList().first().tokenSequence().toList().size
+
+            totalClones += group.clones.toList().size
+
+            for (clone in group.clones.toList()) {
+                val cln = Clone(
+                    clone.tokenSequence().toList().toString(),
+                    clone.text,
+                    listOf(clone.tokenSequence().first().startOffset, clone.tokenSequence().last().startOffset)
+                )
+                listGroup.add(cln)
+            }
+            listOfGroups.add(Group(cloneTokensSize, listGroup))
+        }
+
+        val allClones = AllClones(
+            totalGroups, totalClones, listOfGroups
+        )
+
+//        getClones().for { tree ->
+//            tree.clones.map {
+//                it.tokenSequence().map { el ->
+//                    val start = el.textRange.start
+//                    val end = el.textRange.end
+//                    listOf(start, end)
+//                }.toList()
+//            }.toList()
+//        }
+
+        return gson.toJson(
+            allClones
         )
     }
 }

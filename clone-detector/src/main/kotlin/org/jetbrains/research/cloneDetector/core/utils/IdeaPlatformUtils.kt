@@ -43,28 +43,33 @@ fun PsiElement.findTokens(filter: TokenSet): Sequence<PsiElement> =
 operator fun TokenSet.contains(element: PsiElement?): Boolean = this.contains(element?.node?.elementType)
 
 fun PsiElement.asSequence(): Sequence<PsiElement> =
-    this.depthFirstTraverse { it.children.asSequence() }.filter { it.children.isEmpty() }
+    this.depthFirstTraverse { it.children.asSequence() }//.filter { it.children.isEmpty() }
 
 private val javaTokenFilter = TokenSet.create(
     ElementType.WHITE_SPACE,
     ElementType.DOC_COMMENT,
     ElementType.C_STYLE_COMMENT,
     ElementType.END_OF_LINE_COMMENT,
-    ElementType.REFERENCE_PARAMETER_LIST,
-    ElementType.MODIFIER_LIST
+//    ElementType.REFERENCE_PARAMETER_LIST,
+//    ElementType.MODIFIER_LIST
 )
 
 private val pythonTokenFilter = setOf(
+    "Py:SINGLE_QUOTED_STRING",
     "Py:DOCSTRING",
     "Py:END_OF_LINE_COMMENT",
     "Py:IMPORT_STATEMENT",
-    "Py:FROM_IMPORT_STATEMENT"
+    "Py:FROM_IMPORT_STATEMENT",
+//    "Py:RPAR",
+//    "Py:LPAR"
+// "LBRACE"
+// "RBRACE"
 )
 
 
 fun isNoiseElement(psiElement: PsiElement): Boolean = psiElement in javaTokenFilter
-        || psiElement.textLength == 0
-        // || pythonTokenFilter.contains(psiElement.elementType.toString())
+    || psiElement.textLength == 0
+    || pythonTokenFilter.contains(psiElement.elementType.toString())
 
 
 fun PsiElement.nextLeafElement(): PsiElement? {

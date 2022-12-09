@@ -6,7 +6,7 @@ import org.jetbrains.research.cloneDetector.core.structures.SourceToken
 import org.jetbrains.research.cloneDetector.core.utils.asSequence
 import org.jetbrains.research.cloneDetector.core.utils.depthFirstTraverse
 import org.jetbrains.research.cloneDetector.core.utils.isNoiseElement
-
+//.filterNot(::isNoiseElement)
 class PyIndexedSequence(val psiElement: PsiElement) : IndexedSequence {
     override val sequence: Sequence<SourceToken>
         get() = psiElement.asSequence().filterNot(::isNoiseElement).map(::SourceToken)

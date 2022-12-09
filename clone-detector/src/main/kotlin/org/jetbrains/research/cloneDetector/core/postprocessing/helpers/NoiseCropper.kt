@@ -11,10 +11,10 @@ import org.jetbrains.research.cloneDetector.core.structures.RangeClone
 fun PsiRange.cropBadTokens(): Clone {
     var left = firstPsi
     var right = lastPsi
-    while (isUnclosedLeftBrace(left) || left.elementType in badTokens || left.text in rBraces) {
+    while (isUnclosedLeftBrace(left) || left.elementType in badTokens || left.text in lBraces) {
         left = left.nextSibling ?: break
     }
-    while (isUnclosedRightBrace(right) || right.elementType in badTokens) {
+    while (isUnclosedRightBrace(right) || right.elementType in badTokens || right.text in rBraces) {
         right = right.prevSibling ?: break
     }
     return if (left.textRange.startOffset < right.textRange.startOffset) {
@@ -41,10 +41,10 @@ private val badTokens: TokenSet = TokenSet.create(
 )
 
 private val lBraces: Set<String> =
-    setOf("LPARENTH", "LBRACE", "LBRACKET", "LPAR", "RBRACKET")
+    setOf("LPARENTH", "LBRACE", "LBRACKET", "LPAR", "RBRACKET", "Py:LPAR", "Py:LBRACKET")
 
 private val rBraces: Set<String> =
-    setOf("RPARENTH", "RBRACE", "RBRACKET", "RPAR", "RBRACKET")
+    setOf("RPARENTH", "RBRACE", "RBRACKET", "RPAR", "RBRACKET", "Py:RPAR", "Py:RBRACKET")
 
 private operator fun Set<String>.contains(psiElement: PsiElement) =
     psiElement.node.elementType.toString() in this
