@@ -183,7 +183,7 @@ object CloneIndexer {
         val clonesGroups = getClones()
         val totalGroups = clonesGroups.size
 
-
+        println("IM HERE...")
         val listOfGroups: MutableList<Group> = mutableListOf()
         var totalClones = 0
 
